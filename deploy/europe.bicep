@@ -66,7 +66,7 @@ resource workflowInNorthEurope 'Microsoft.Logic/workflows@2019-05-01' = [for i i
   }
 }]
 
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' = {
   name: '${resourceNamePrefix}-logs'
   location: location
   properties: {
