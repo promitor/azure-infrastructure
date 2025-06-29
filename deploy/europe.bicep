@@ -199,7 +199,7 @@ resource iotHub 'Microsoft.Devices/IotHubs@2021-07-02' = {
   properties: {}
 }
 
-resource eventGridDomain 'Microsoft.EventGrid/domains@2022-06-15' = {
+resource eventGridDomain 'Microsoft.EventGrid/domains@2025-02-15' = {
   name: '${resourceNamePrefix}-event-domains'
   location: location
   properties: {
