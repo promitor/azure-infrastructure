@@ -153,7 +153,7 @@ resource sqlServer 'Microsoft.Sql/servers@2021-11-01' = {
   }
 }
 
-resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01' = [for i in range(1, 3): {
+resource sqlDatabase 'Microsoft.Sql/servers/databases@2023-08-01' = [for i in range(1, 3): {
   parent: sqlServer
   name: '${resourceNamePrefix}-sql-db-${i}'
   location: location
