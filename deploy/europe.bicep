@@ -386,7 +386,7 @@ resource cosmosDbDocumentationContainer 'Microsoft.DocumentDB/databaseAccounts/s
   }
 }
 
-resource cosmosDbDatabaseThroughput 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/throughputSettings@2023-04-15' = {
+resource cosmosDbDatabaseThroughput 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/throughputSettings@2025-04-15' = {
   parent: cosmosDbDocumentationContainer
   name: 'default'
   properties: {
