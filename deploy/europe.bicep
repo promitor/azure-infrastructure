@@ -167,7 +167,7 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01' = [for i in ra
   }
 }]
 
-resource apiManagement 'Microsoft.ApiManagement/service@2022-08-01' = {
+resource apiManagement 'Microsoft.ApiManagement/service@2024-05-01' = {
   name: '${resourceNamePrefix}-api-platform'
   location: location
   sku: {
