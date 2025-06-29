@@ -316,7 +316,7 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
   }
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
+resource keyVault 'Microsoft.KeyVault/vaults@2024-11-01' = {
   name: 'promitorsecretstore'
   location: location
   properties: {
