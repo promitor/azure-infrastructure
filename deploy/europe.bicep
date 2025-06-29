@@ -8,7 +8,7 @@ param geo string = 'eu'
 
 param alternativeLocation string = 'northeurope'
 
-resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' = {
+resource automationAccount 'Microsoft.Automation/automationAccounts@2024-10-23' = {
   name: '${resourceNamePrefix}-automation-1'
   location: location
   properties: {
