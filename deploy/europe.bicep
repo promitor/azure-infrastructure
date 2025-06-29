@@ -329,7 +329,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
   }
 }
 
-resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
+resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2025-04-15' = {
   name: '${resourceNamePrefix}-cosmos-db'
   location: location
   tags: {
