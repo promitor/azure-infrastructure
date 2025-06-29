@@ -180,7 +180,7 @@ resource apiManagement 'Microsoft.ApiManagement/service@2022-08-01' = {
   }
 }
 
-resource cdn 'Microsoft.Cdn/profiles@2021-06-01' = {
+resource cdn 'Microsoft.Cdn/profiles@2025-04-15' = {
   name: '${resourceNamePrefix}-cdn'
   location: 'Global'
   sku: {
