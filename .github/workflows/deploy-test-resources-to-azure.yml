@@ -35,7 +35,6 @@ jobs:
           subscriptionId: ${{ vars.AZURE_SUBSCRIPTION }}
           resourceGroupName: ${{ env.AZURE_RESOURCEGROUP_NAME }}
           template: ./deploy/us.bicep
-          parameters: mariaDbServerPassword=${{ secrets.AZURE_MARIADB_SERVER_PASSWORD }}
           deploymentName: us-run-${{ github.run_number }}
           deploymentMode: Complete
           failOnStdErr: false
