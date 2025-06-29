@@ -208,7 +208,7 @@ resource eventGridDomain 'Microsoft.EventGrid/domains@2022-06-15' = {
   }
 }
 
-resource appPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
+resource appPlan 'Microsoft.Web/serverfarms@2024-11-01' = {
   name: '${resourceNamePrefix}-app-plan'
   location: 'northeurope'
   kind: 'linux'

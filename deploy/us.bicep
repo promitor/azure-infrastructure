@@ -28,7 +28,7 @@ resource workflow 'Microsoft.Logic/workflows@2019-05-01' = [for i in range(1, 3)
   }
 }]
 
-resource serverlessAppPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
+resource serverlessAppPlan 'Microsoft.Web/serverfarms@2024-11-01' = {
   name: '${resourceNamePrefix}-serverless-app-plan'
   location: location
   tags: {
