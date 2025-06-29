@@ -297,7 +297,7 @@ resource autoscalingRules 'microsoft.insights/autoscalesettings@2022-10-01' = {
   }
 }
 
-resource webApp 'Microsoft.Web/sites@2022-09-01' = {
+resource webApp 'Microsoft.Web/sites@2024-11-01' = {
   name: '${resourceNamePrefix}-web-app'
   location: 'northeurope'
   tags: {}
