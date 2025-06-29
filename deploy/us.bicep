@@ -92,7 +92,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-11-01' = {
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-11-01' = {
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2024-07-01' = {
   name: '${resourceNamePrefix}-public-IP-resource'
   location: location
   properties: {
