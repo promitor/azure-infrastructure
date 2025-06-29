@@ -30,7 +30,7 @@ jobs:
 
         # Deploy Bicep file for Americas
       - name: Deploy to Azure (Americas)
-        uses: azure/arm-deploy@v1
+        uses: azure/arm-deploy@v2
         with:
           subscriptionId: ${{ vars.AZURE_SUBSCRIPTION }}
           resourceGroupName: ${{ env.AZURE_RESOURCEGROUP_NAME }}
@@ -59,7 +59,7 @@ jobs:
 
         # Deploy Bicep file for APAC
       - name: Deploy to Azure (APAC)
-        uses: azure/arm-deploy@v1
+        uses: azure/arm-deploy@v2
         with:
           subscriptionId: ${{ vars.AZURE_SUBSCRIPTION }}
           resourceGroupName: ${{ env.AZURE_RESOURCEGROUP_NAME }}
@@ -88,7 +88,7 @@ jobs:
 
         # Deploy Bicep file for Europe
       - name: Deploy to Azure (Europe)
-        uses: azure/arm-deploy@v1
+        uses: azure/arm-deploy@v2
         with:
           subscriptionId: ${{ vars.AZURE_SUBSCRIPTION }}
           resourceGroupName: ${{ env.AZURE_RESOURCEGROUP_NAME }}
