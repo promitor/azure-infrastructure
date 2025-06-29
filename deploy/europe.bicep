@@ -115,7 +115,7 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
   }
 }
 
-resource storageAccounts_promitor_name_resource 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+resource storageAccounts_promitor_name_resource 'Microsoft.Storage/storageAccounts@2024-01-01' = {
   name: 'promitortestingstorage'
   location: location
   sku: {
