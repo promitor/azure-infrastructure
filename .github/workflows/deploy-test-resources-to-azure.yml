@@ -9,6 +9,9 @@ on:
     - '!deploy/large-scale/**'
     - '.github/workflows/deploy-to-azure.yml'
 
+permissions:
+  id-token: write
+
 jobs:
   deploy_to_us:
       name: Deploy to US
