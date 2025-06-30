@@ -8,8 +8,10 @@ on:
     - 'deploy/large-scale/**'
     - '.github/workflows/deploy-resources-at-scale-to-azure.yml'
 
-jobs:
+permissions:
+  id-token: write
 
+jobs:
   deploy_to_americas:
       name: Deploy to Americas
       env:
