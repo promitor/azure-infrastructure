@@ -144,7 +144,7 @@ resource serviceBusTopic 'Microsoft.ServiceBus/namespaces/topics@2021-11-01' = {
 
 resource sqlServer 'Microsoft.Sql/servers@2021-11-01' = {
   name: '${resourceNamePrefix}-sql-server'
-  location: location
+  location: alternativeLocation
   properties: {
     administratorLogin: 'tom'
     administratorLoginPassword: sqlServerPassword
@@ -392,28 +392,6 @@ resource cosmosDbDatabaseThroughput 'Microsoft.DocumentDB/databaseAccounts/sqlDa
   properties: {
     resource: {
       throughput: 400
-    }
-  }
-}
-
-resource mySQLServer 'Microsoft.DBforMySQL/servers@2017-12-01' = {
-  name: '${resourceNamePrefix}-mysql-srv'
-  location: location
-  sku: {
-    name: 'B_Gen5_1'
-    tier: 'Basic'
-    capacity: 1
-    family: 'Gen5'
-  }
-  properties: {
-    createMode: 'Default'
-    version: '5.7'
-    administratorLogin: 'testadmin'
-    administratorLoginPassword: sqlServerPassword
-    sslEnforcement: 'Enabled'
-    minimalTlsVersion: 'TLS1_2'
-    storageProfile: {
-      storageMB: 5120
     }
   }
 }
