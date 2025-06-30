@@ -1,6 +1,3 @@
-@secure()
-param mariaDbServerPassword string
-
 param location string = resourceGroup().location
 param resourceNamePrefix string = 'promitor-testing-resource-${geo}'
 param region string = 'USA'
@@ -172,41 +169,5 @@ resource trafficManager 'Microsoft.Network/trafficmanagerprofiles@2018-08-01' = 
         }
       }
     ]
-  }
-}
-
-resource mariaDbServer 'Microsoft.DBforMariaDB/servers@2018-06-01' = {
-  name: '${resourceNamePrefix}-mariadb-server'
-  location: location
-  tags: {
-    region: region
-    app: 'promitor-resource-discovery-tests'
-  }
-  sku: {
-    capacity: 1
-    family: 'Gen5'
-    name: 'B_Gen5_1'
-    size: '51200'
-    tier: 'Basic'
-  }
-  properties: {
-    storageProfile: {
-      backupRetentionDays: 7
-      geoRedundantBackup: 'Disabled'
-      storageAutogrow: 'Enabled'
-    }
-    version: '10.3'
-    createMode: 'Default'
-    administratorLogin: 'tom'
-    administratorLoginPassword: mariaDbServerPassword
-  }
-}
-
-resource mariaDbDatabase 'Microsoft.DBforMariaDB/servers/databases@2018-06-01' = {
-  name: 'example-db-1'
-  parent: mariaDbServer
-  properties: {
-    charset: 'utf8'
-    collation: 'utf8_general_ci'
   }
 }
