@@ -41,7 +41,7 @@ jobs:
           resourceGroupName: ${{ env.AZURE_RESOURCEGROUP_NAME }}
           template: ./deploy/us.bicep
           deploymentName: us-run-${{ github.run_number }}
-          deploymentMode: Complete
+          deploymentMode: Incremental
           failOnStdErr: false
 
   deploy_to_europe:
