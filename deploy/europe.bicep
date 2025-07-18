@@ -1,15 +1,32 @@
 @secure()
 param sqlServerPassword string
-
 param location string = resourceGroup().location
-param resourceNamePrefix string = 'promitor-testing-resource-${geo}'
 param region string = 'Europe'
 param geo string = 'eu'
-
 param alternativeLocation string = 'northeurope'
 
+// Parameters for naming strategy
+@minLength(3)
+param projectName string = 'promitor'
+@minLength(3)
+param environment string = 'dev'
+
+// Create deterministic unique names based on subscription, tenant and environment
+var subscriptionId = subscription().subscriptionId
+var tenantId = tenant().tenantId
+var namingHash = take(uniqueString(subscriptionId, tenantId, environment, projectName), 8)
+var baseName = '${projectName}-${environment}'
+var resourceNamePrefix = '${baseName}-${geo}-${namingHash}'
+
+// Function to create valid storage account name (only lowercase letters and numbers, 24 chars max)
+var cleanName = replace(replace(toLower(resourceNamePrefix), '-', ''), '_', '')
+var storageAccountName = take(cleanName, 24)
+
+// Function to create valid key vault and cosmos names (only alphanumeric and hyphens, start with letter)
+var globallyUniqueName = take('${baseName}-${namingHash}', 24)
+
 resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' = {
-  name: '${resourceNamePrefix}-automation-1'
+  name: '${resourceNamePrefix}-auto-1'
   location: location
   properties: {
     sku: {
@@ -23,12 +40,12 @@ resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' 
 }
 
 resource workflowInWestEurope 'Microsoft.Logic/workflows@2019-05-01' = [for i in range(1, 3): {
-  name: '${resourceNamePrefix}-workflow-${geo}-${i}'
+  name: '${resourceNamePrefix}-wf-${geo}-${i}'
   location: location
   tags: {
     region: region
     app: 'promitor-resource-discovery-tests'
-    instance: '${resourceNamePrefix}-workflow-${geo}-${i}'
+    instance: '${resourceNamePrefix}-wf-${geo}-${i}'
   }
   properties: {
     state: 'Enabled'
@@ -45,12 +62,12 @@ resource workflowInWestEurope 'Microsoft.Logic/workflows@2019-05-01' = [for i in
 }]
 
 resource workflowInNorthEurope 'Microsoft.Logic/workflows@2019-05-01' = [for i in range(4, 3): {
-  name: '${resourceNamePrefix}-workflow-${geo}-${i}'
+  name: '${resourceNamePrefix}-wf-${geo}-${i}'
   location: alternativeLocation
   tags: {
     region: region
     app: 'promitor-resource-discovery-tests'
-    instance: '${resourceNamePrefix}-workflow-${geo}-${i}'
+    instance: '${resourceNamePrefix}-wf-${geo}-${i}'
   }
   properties: {
     state: 'Enabled'
@@ -81,7 +98,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06
 }
 
 resource applicationInsights 'microsoft.insights/components@2020-02-02' = {
-  name: '${resourceNamePrefix}-telemetry'
+  name: '${resourceNamePrefix}-ai'
   location: location
   kind: 'web'
   properties: {
@@ -93,7 +110,7 @@ resource applicationInsights 'microsoft.insights/components@2020-02-02' = {
 }
 
 resource classicApplicationInsights 'microsoft.insights/components@2020-02-02' = {
-  name: '${resourceNamePrefix}-telemetry-classic'
+  name: '${resourceNamePrefix}-ai-classic'
   location: location
   kind: 'web'
   properties: {
@@ -103,7 +120,7 @@ resource classicApplicationInsights 'microsoft.insights/components@2020-02-02' =
 }
 
 resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
-  name: '${resourceNamePrefix}-messaging'
+  name: '${resourceNamePrefix}-sbus'
   location: location
   sku: {
     name: 'Standard'
@@ -116,7 +133,7 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
 }
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: 'promitortestingstorage'
+  name: storageAccountName
   location: location
   sku: {
     name: 'Standard_LRS'
@@ -143,7 +160,7 @@ resource serviceBusTopic 'Microsoft.ServiceBus/namespaces/topics@2021-11-01' = {
 }
 
 resource sqlServer 'Microsoft.Sql/servers@2021-11-01' = {
-  name: '${resourceNamePrefix}-sql-server'
+  name: '${resourceNamePrefix}-sql'
   location: alternativeLocation
   properties: {
     administratorLogin: 'tom'
@@ -155,7 +172,7 @@ resource sqlServer 'Microsoft.Sql/servers@2021-11-01' = {
 
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01' = [for i in range(1, 3): {
   parent: sqlServer
-  name: '${resourceNamePrefix}-sql-db-${i}'
+  name: '${resourceNamePrefix}-db-${i}'
   location: alternativeLocation
   sku: {
     name: 'Basic'
@@ -168,7 +185,7 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01' = [for i in ra
 }]
 
 resource apiManagement 'Microsoft.ApiManagement/service@2022-08-01' = {
-  name: '${resourceNamePrefix}-api-platform'
+  name: '${resourceNamePrefix}-apim'
   location: location
   sku: {
     name: 'Consumption'
@@ -190,7 +207,7 @@ resource cdn 'Microsoft.Cdn/profiles@2021-06-01' = {
 }
 
 resource iotHub 'Microsoft.Devices/IotHubs@2021-07-02' = {
-  name: '${resourceNamePrefix}-iot-gateway'
+  name: '${resourceNamePrefix}-iot'
   location: location
   sku: {
     name: 'F1'
@@ -200,7 +217,7 @@ resource iotHub 'Microsoft.Devices/IotHubs@2021-07-02' = {
 }
 
 resource eventGridDomain 'Microsoft.EventGrid/domains@2022-06-15' = {
-  name: '${resourceNamePrefix}-event-domains'
+  name: '${resourceNamePrefix}-egd'
   location: location
   properties: {
     inputSchema: 'CloudEventSchemaV1_0'
@@ -209,7 +226,7 @@ resource eventGridDomain 'Microsoft.EventGrid/domains@2022-06-15' = {
 }
 
 resource appPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
-  name: '${resourceNamePrefix}-app-plan'
+  name: '${resourceNamePrefix}-plan'
   location: 'northeurope'
   kind: 'linux'
   tags: {}
@@ -223,7 +240,7 @@ resource appPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 }
 
 resource autoscalingRules 'microsoft.insights/autoscalesettings@2022-10-01' = {
-  name: '${resourceNamePrefix}-app-plan-autoscaling'
+  name: '${resourceNamePrefix}-autoscale'
   location: location
   properties: {
     profiles: [
@@ -281,7 +298,7 @@ resource autoscalingRules 'microsoft.insights/autoscalesettings@2022-10-01' = {
       }
     ]
     enabled: false
-    name: '${resourceNamePrefix}-app-plan-autoscaling'
+    name: '${resourceNamePrefix}-autoscale'
     targetResourceUri: appPlan.id
     notifications: [
       {
@@ -298,7 +315,7 @@ resource autoscalingRules 'microsoft.insights/autoscalesettings@2022-10-01' = {
 }
 
 resource webApp 'Microsoft.Web/sites@2022-09-01' = {
-  name: '${resourceNamePrefix}-web-app'
+  name: '${resourceNamePrefix}-web'
   location: 'northeurope'
   tags: {}
   properties: {
@@ -337,7 +354,7 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
 }
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
-  name: 'promitorsecretstore'
+  name: take(replace(toLower('${globallyUniqueName}-kv'), '-', ''), 24)
   location: location
   properties: {
     sku: {
@@ -350,8 +367,8 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
 }
 
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
-  name: '${resourceNamePrefix}-cosmos-db'
-  location: location
+  name: take(replace(toLower('${globallyUniqueName}-cosmos'), '-', ''), 44)
+  location: alternativeLocation
   tags: {
     CosmosAccountType: 'Non-Production'
   }
