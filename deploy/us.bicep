@@ -1,15 +1,26 @@
 param location string = resourceGroup().location
-param resourceNamePrefix string = 'promitor-testing-resource-${geo}'
+param alternativeLocation string = 'eastus2'
 param region string = 'USA'
 param geo string = 'us'
 
+// Parameters for naming strategy
+param projectName string = 'promitor'
+param environment string = 'dev'
+
+// Create deterministic unique names based on subscription, tenant and environment
+var subscriptionId = subscription().subscriptionId
+var tenantId = tenant().tenantId
+var namingHash = take(uniqueString(subscriptionId, tenantId, environment, projectName), 8)
+var baseName = '${projectName}-${environment}'
+var resourceNamePrefix = '${baseName}-${geo}-${namingHash}'
+
 resource workflow 'Microsoft.Logic/workflows@2019-05-01' = [for i in range(1, 3): {
-  name: 'promitor-testing-resource-${geo}-${i}'
+  name: '${resourceNamePrefix}-wf-${geo}-${i}'
   location: location
   tags: {
     region: region
     app: 'promitor-resource-discovery-tests'
-    instance: '${resourceNamePrefix}-workflow-${geo}-${i}'
+    instance: '${resourceNamePrefix}-wf-${geo}-${i}'
   }
   properties: {
     state: 'Enabled'
@@ -27,7 +38,7 @@ resource workflow 'Microsoft.Logic/workflows@2019-05-01' = [for i in range(1, 3)
 
 resource serverlessAppPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: '${resourceNamePrefix}-serverless-app-plan'
-  location: location
+  location: alternativeLocation
   tags: {
     region: region
     app: 'promitor-resource-discovery-tests'
@@ -46,7 +57,7 @@ resource serverlessAppPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 
 resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
   name: '${resourceNamePrefix}-serverless-functions'
-  location: location
+  location: alternativeLocation
   kind: 'functionapp'
   tags: {
     region: region
@@ -90,11 +101,11 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-11-01' = {
 }
 
 resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-11-01' = {
-  name: '${resourceNamePrefix}-public-IP-resource'
+  name: '${resourceNamePrefix}-public-ip'
   location: location
   properties: {
     dnsSettings: {
-      domainNameLabel: '${resourceNamePrefix}-public-ip-resource'
+      domainNameLabel: '${resourceNamePrefix}-public-ip'
     }
     publicIPAddressVersion: 'IPv4'
     publicIPAllocationMethod: 'Static'
