@@ -73,5 +73,5 @@ jobs:
           template: ./deploy/europe.bicep
           parameters: sqlServerPassword=${{ secrets.SQL_PASSWORD }}
           deploymentName: europe-run-${{ github.run_number }}
-          deploymentMode: Complete
+          deploymentMode: Incremental
           failOnStdErr: false
