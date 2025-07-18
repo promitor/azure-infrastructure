@@ -30,6 +30,7 @@ var storageAccountName = take(cleanName, 24)
 
 // Function to create valid key vault and cosmos names (only alphanumeric and hyphens, start with letter)
 var globallyUniqueName = take('${baseName}-${namingHash}', 24)
+var keyVaultUniqueName = take(replace(toLower('${projectName}${environment}${geo}${uniqueString(subscription().id, resourceGroup().id)}kv'), '-', ''), 24)
 
 resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' = {
   name: '${resourceNamePrefix}-auto-1'
@@ -360,14 +361,17 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
 }
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
-  name: take(replace(toLower('${globallyUniqueName}-kv'), '-', ''), 24)
+  name: keyVaultUniqueName
   location: location
   properties: {
     sku: {
       family: 'A'
       name: 'standard'
     }
-    tenantId: 'c8819874-9e56-4e3f-b1a8-1c0325138f27'
+    tenantId: subscription().tenantId
+    enableSoftDelete: true
+    softDeleteRetentionInDays: 7
+    enablePurgeProtection: false
     accessPolicies: []
   }
 }
