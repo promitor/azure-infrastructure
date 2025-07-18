@@ -6,9 +6,7 @@ param geo string = 'eu'
 param alternativeLocation string = 'northeurope'
 
 // Parameters for naming strategy
-@minLength(3)
 param projectName string = 'promitor'
-@minLength(3)
 param environment string = 'dev'
 
 // Create deterministic unique names based on subscription, tenant and environment
