@@ -1,12 +1,20 @@
 @secure()
 param sqlServerPassword string
+@minLength(3)
 param location string = resourceGroup().location
+@minLength(3)
 param region string = 'Europe'
+@minLength(2)
 param geo string = 'eu'
+@minLength(3)
 param alternativeLocation string = 'northeurope'
 
 // Parameters for naming strategy
+@minLength(3)
+@maxLength(20)
 param projectName string = 'promitor'
+@minLength(3)
+@maxLength(10)
 param environment string = 'dev'
 
 // Create deterministic unique names based on subscription, tenant and environment
