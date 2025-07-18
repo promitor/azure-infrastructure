@@ -1,15 +1,34 @@
+@minLength(3)
 param location string = resourceGroup().location
-param resourceNamePrefix string = 'promitor-testing-resource-${geo}'
+@minLength(3)
 param region string = 'USA'
+@minLength(2)
 param geo string = 'us'
+@minLength(3)
+@maxLength(20)
+param projectName string = 'promitor'
+@minLength(3)
+@maxLength(10)
+param environment string = 'dev'
+
+// Create deterministic unique names based on subscription, tenant and environment
+var subscriptionId = subscription().subscriptionId
+var tenantId = tenant().tenantId
+var namingHash = take(uniqueString(subscriptionId, tenantId, environment, projectName), 8)
+var baseName = '${projectName}-${environment}'
+var resourceNamePrefix = '${baseName}-${geo}-${namingHash}'
+
+// Function to create unique names
+var uniqueNameSuffix = uniqueString(subscription().id, resourceGroup().id)
+var functionAppName = '${resourceNamePrefix}-${uniqueNameSuffix}-functions'
 
 resource workflow 'Microsoft.Logic/workflows@2019-05-01' = [for i in range(1, 3): {
-  name: 'promitor-testing-resource-${geo}-${i}'
+  name: '${resourceNamePrefix}-wf-${i}'
   location: location
   tags: {
     region: region
     app: 'promitor-resource-discovery-tests'
-    instance: '${resourceNamePrefix}-workflow-${geo}-${i}'
+    instance: '${resourceNamePrefix}-wf-${i}'
   }
   properties: {
     state: 'Enabled'
@@ -26,7 +45,7 @@ resource workflow 'Microsoft.Logic/workflows@2019-05-01' = [for i in range(1, 3)
 }]
 
 resource serverlessAppPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
-  name: '${resourceNamePrefix}-serverless-app-plan'
+  name: '${resourceNamePrefix}-plan'
   location: location
   tags: {
     region: region
@@ -45,7 +64,7 @@ resource serverlessAppPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 }
 
 resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
-  name: '${resourceNamePrefix}-serverless-functions'
+  name: functionAppName
   location: location
   kind: 'functionapp'
   tags: {
@@ -90,11 +109,11 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-11-01' = {
 }
 
 resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-11-01' = {
-  name: '${resourceNamePrefix}-public-IP-resource'
+  name: '${resourceNamePrefix}-pip'
   location: location
   properties: {
     dnsSettings: {
-      domainNameLabel: '${resourceNamePrefix}-public-ip-resource'
+      domainNameLabel: toLower('${resourceNamePrefix}-${uniqueNameSuffix}-pip')
     }
     publicIPAddressVersion: 'IPv4'
     publicIPAllocationMethod: 'Static'
@@ -107,9 +126,12 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-11-01' = {
 }
 
 resource loadBalancer 'Microsoft.Network/loadBalancers@2022-11-01' = {
-  name: '${resourceNamePrefix}-load-balancer'
+  name: '${resourceNamePrefix}-lb'
   location: location
-  tags: {}
+  tags: {
+    region: region
+    app: 'promitor-resource-discovery-tests'
+  }
   properties: {
     frontendIPConfigurations: [
       {
@@ -134,13 +156,13 @@ resource loadBalancer 'Microsoft.Network/loadBalancers@2022-11-01' = {
 }
 
 resource trafficManager 'Microsoft.Network/trafficmanagerprofiles@2018-08-01' = {
-  name: '${resourceNamePrefix}-traffic-manager'
+  name: '${resourceNamePrefix}-tm'
   location: 'global'
   properties: {
     profileStatus: 'Enabled'
     trafficRoutingMethod: 'Priority'
     dnsConfig: {
-      relativeName: '${resourceNamePrefix}-traffic-router'
+      relativeName: toLower('${resourceNamePrefix}-${uniqueNameSuffix}-tm')
       ttl: 300
     }
     monitorConfig: {
