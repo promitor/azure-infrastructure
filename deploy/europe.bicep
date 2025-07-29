@@ -336,6 +336,52 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
   }
 }
 
+resource webTest 'Microsoft.Insights/webtests@2022-06-15' = {
+  name: '${resourceNamePrefix}-web-test'
+  location: location
+  tags: {
+    'hidden-link:${applicationInsights.id}': 'Resource'
+  }
+  kind: 'standard'
+  properties: {
+    Name: '${resourceNamePrefix}-availability-test'
+    Description: 'Availability monitoring test for ${webApp.name}'
+    Enabled: true
+    Frequency: 300
+    Timeout: 120
+    Kind: 'standard'
+    RetryEnabled: true
+    Locations: [
+      {
+        Id: 'apac-au-syd-edge' // Australia East
+      }
+      {
+        Id: 'emea-nl-ams-azr' // North Europe
+      }
+      {
+        Id: 'us-tx-sn1-azr' // South Central US
+      }
+      {
+        Id: 'apac-sg-sin-azr' // Southeast Asia
+      }
+      {
+        Id: 'emea-gb-db3-azr' // UK West
+      }
+    ]
+    Request: {
+      RequestUrl: 'https://${webApp.properties.defaultHostName}'
+      HttpVerb: 'GET'
+      ParseDependentRequests: false
+    }
+    ValidationRules: {
+      ExpectedHttpStatusCode: 200
+      SSLCheck: true
+      SSLCertRemainingLifetimeCheck: 7
+    }
+    SyntheticMonitorId: '${resourceNamePrefix}-web-test'
+  }
+}
+
 resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: 'promitorsecretstore'
   location: location
